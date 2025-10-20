@@ -1,8 +1,8 @@
 import { StyleSheet, View, Image, Dimensions, Text, TouchableOpacity, Alert } from 'react-native';
 import { useState } from 'react';
 import Swiper from 'react-native-swiper';
-import * as Crypto from 'expo-crypto';               
-import AsyncStorage from '@react-native-async-storage/async-storage';  
+import * as Crypto from 'expo-crypto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import PersonalInfo from './components/PersonalInfo';
 import MovieBooking from './components/MovieBooking';
@@ -19,15 +19,29 @@ export default function App() {
     balcony: 0,
   });
 
-  
+
   async function saveData() {
-    const uuid = Crypto.randomUUID();
+    const uuid = Crypto.randomUUID(); 
     await AsyncStorage.setItem(uuid, JSON.stringify(booking));
     alert("Saved with UUID: " + uuid);
     Alert.alert("Saved with UUID: " + uuid);
   }
 
- 
+  
+  async function getData() {
+    try {
+      let thisBooking = await AsyncStorage.getItem(uuid);
+      let parsedBooking = JSON.parse(thisBooking);
+      if (parsedBooking) {
+        Alert.alert("Movie Title: " + parsedBooking.movieTitle);
+      } else {
+        Alert.alert("No booking found for this UUID.");
+      }
+    } catch (error) {
+      Alert.alert("Error getting data: " + error.message);
+    }
+  }
+
   return (
     <View style={styles.screencontainer}>
       <View style={styles.imgview}>
@@ -42,6 +56,11 @@ export default function App() {
       
       <TouchableOpacity style={styles.button} onPress={saveData}>
         <Text style={{ fontSize: 24, fontWeight: "bold" }}>Save Data</Text>
+      </TouchableOpacity>
+
+      
+      <TouchableOpacity style={styles.button} onPress={getData}>
+        <Text style={{ fontSize: 24, fontWeight: "bold" }}>Get Data</Text>
       </TouchableOpacity>
     </View>
   );
