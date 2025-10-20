@@ -1,10 +1,16 @@
-import { StyleSheet, View, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Image, Dimensions, Text, TouchableOpacity, Alert } from 'react-native';
 import { useState } from 'react';
 import Swiper from 'react-native-swiper';
+import * as Crypto from 'expo-crypto';               
+import AsyncStorage from '@react-native-async-storage/async-storage';  
+
 import PersonalInfo from './components/PersonalInfo';
 import MovieBooking from './components/MovieBooking';
 
 export default function App() {
+  
+  var uuid = Crypto.randomUUID();
+
   
   const [booking, setBooking] = useState({
     bookDate: "2000-02-02",
@@ -13,6 +19,15 @@ export default function App() {
     balcony: 0,
   });
 
+  
+  async function saveData() {
+    const uuid = Crypto.randomUUID();
+    await AsyncStorage.setItem(uuid, JSON.stringify(booking));
+    alert("Saved with UUID: " + uuid);
+    Alert.alert("Saved with UUID: " + uuid);
+  }
+
+ 
   return (
     <View style={styles.screencontainer}>
       <View style={styles.imgview}>
@@ -20,15 +35,20 @@ export default function App() {
       </View>
 
       <Swiper showsButtons={true}>
-        
         <PersonalInfo screenstyle={styles.screen} data={booking} setData={setBooking} />
         <MovieBooking screenstyle={styles.screen} data={booking} setData={setBooking} />
       </Swiper>
+
+      
+      <TouchableOpacity style={styles.button} onPress={saveData}>
+        <Text style={{ fontSize: 24, fontWeight: "bold" }}>Save Data</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 var width = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   imgview: {
     flexDirection: "row",
@@ -46,5 +66,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "start",
     padding: "10%",
+  },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
   },
 });
